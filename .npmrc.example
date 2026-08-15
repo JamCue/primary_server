@@ -1,0 +1,3 @@
+# This authToken can be shared and stored in github (packages read permission)
+//npm.pkg.github.com/:_authToken=PUT_AUTH_TOKEN_HERE //This will be github personal access token
+always-auth=true

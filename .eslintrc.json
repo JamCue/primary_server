@@ -1,0 +1,25 @@
+{
+  "extends": "./node_modules/gts/",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "plugins": ["import", "simple-import-sort"],
+  "rules": {
+    "max-len": ["error", { "code": 120, "ignoreStrings": true, "ignorePattern": "\\s*private readonly\\s.+=\\s*new\\s*"}],
+    "@typescript-eslint/explicit-function-return-type": "error",
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-unsafe-argument": "error",
+    "@typescript-eslint/no-unsafe-assignment": "error",
+    "@typescript-eslint/no-unsafe-member-access": "error",
+    "@typescript-eslint/no-unsafe-return": "error",
+    "curly": "error",
+    "import/order": [
+      "warn", {
+        "groups": [["builtin", "external"]],
+        "newlines-between": "always"
+      }
+    ],
+    "simple-import-sort/imports": "warn",
+    "simple-import-sort/exports": "warn"
+  }
+}
