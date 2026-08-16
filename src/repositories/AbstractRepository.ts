@@ -1,22 +1,20 @@
 import CheckIfEnvIsLocalService from '@services/CheckIfEnvIsLocalService';
 import RepositoryCollectionType from '@t/RepositoryCollectionType';
-import admin from 'firebase-admin';
+import mongoose, {Schema} from 'mongoose';
 
-admin.initializeApp();
-
-abstract class AbstractRepository {
-  protected db;
-  protected collection: RepositoryCollectionType;
+abstract class AbstractRepository<T> {
+  protected readonly collection: RepositoryCollectionType<T>;
 
   protected constructor(
     collectionName: string,
+    schema: Schema<T>,
     protected readonly checkIfEnvIsLocalService = new CheckIfEnvIsLocalService()
   ) {
-    this.db = admin.firestore();
-
     const suffix = this.checkIfEnvIsLocalService.handle() ? '-local' : '';
+    const modelName = `${collectionName}${suffix}`;
 
-    this.collection = this.db.collection(collectionName + suffix);
+    this.collection =
+      (mongoose.models[modelName] as RepositoryCollectionType<T>) ?? mongoose.model<T>(modelName, schema, modelName);
   }
 }
 

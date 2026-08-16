@@ -1,8 +1,5 @@
-import {firestore} from 'firebase-admin';
+import {Model} from 'mongoose';
 
-import CollectionReference = firestore.CollectionReference;
-import DocumentData = firestore.DocumentData;
-
-type RepositoryCollectionType = CollectionReference<DocumentData>;
+type RepositoryCollectionType<T> = Model<T>;
 
 export default RepositoryCollectionType;

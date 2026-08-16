@@ -11,12 +11,14 @@ import helmet from 'helmet';
 import {ReasonPhrases, StatusCodes} from 'http-status-codes';
 
 import {connectDatabase} from './config/database';
+import {connectFirebase} from './config/firebase';
 
 dotenv.config();
 
 class App {
   constructor(private readonly app = express()) {
     this.initializeDatabase();
+    this.initializeFirebase();
     this.initializeMiddlewares();
     this.initializeRoutes();
     this.initializeErrorHandler();
@@ -30,6 +32,10 @@ class App {
     connectDatabase().catch((error: unknown) => {
       console.error('❌ Failed to initialize database connection:', error);
     });
+  }
+
+  private initializeFirebase(): void {
+    connectFirebase();
   }
 
   private initializeMiddlewares(): void {
@@ -50,7 +56,7 @@ class App {
       return next();
     });
 
-    app.use('/v1/boilerplate', router);
+    app.use('/v1', router);
 
     app.use((req: Request, res: Response) => {
       return res.status(StatusCodes.NOT_FOUND).json({

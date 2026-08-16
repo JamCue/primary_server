@@ -1,5 +1,3 @@
-import {afterEach} from 'node:test';
-
 import GetMicroserviceVersionService from '@services/GetMicroserviceVersionService';
 import HttpResponseOk from '@value-objects/HttpResponseOk';
 
