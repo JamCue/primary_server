@@ -1,13 +1,13 @@
 import GetLoggedInUserService from '@services/business-logic/GetLoggedInUserService';
 import LogApiErrorService from '@services/LogApiErrorService';
-import GetFirebaseRefIdFromRequestService from '@services/parameter-validation/GetFirebaseRefIdFromRequestService';
+import GetLoggedInUserRequestService from '@services/request-services/GetLoggedInUserRequestService';
 import {NextFunction, Request, Response} from 'express';
 
 class GetLoggedInUserController {
   async get(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const firebaseRefId = new GetFirebaseRefIdFromRequestService().handle(req);
-      const {status, payload} = await new GetLoggedInUserService().handle(firebaseRefId);
+      const dto = await new GetLoggedInUserRequestService().handle(req);
+      const {status, payload} = await new GetLoggedInUserService().handle(dto);
 
       res.status(status).json(payload);
     } catch (e) {

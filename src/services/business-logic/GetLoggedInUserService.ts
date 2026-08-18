@@ -1,3 +1,4 @@
+import GetLoggedInUserRequestServiceDto from '@dtos/GetLoggedInUserRequestServiceDto';
 import GetUserByFirebaseRefIdServiceException from '@exceptions/inner/GetUserByFirebaseRefIdServiceException';
 import UserNotFoundException from '@exceptions/UserNotFoundException';
 import HttpServiceInterface from '@i/HttpServiceInterface';
@@ -13,8 +14,8 @@ class GetLoggedInUserService implements HttpServiceInterface {
    * @throws inner/GetUserByFirebaseRefIdServiceException
    * @throws UserNotFoundException
    */
-  public async handle(firebaseRefId: FirebaseRefIdType): Promise<HttpResponseOk> {
-    const user = await this.getUser(firebaseRefId);
+  public async handle(dto: GetLoggedInUserRequestServiceDto): Promise<HttpResponseOk> {
+    const user = await this.getUser(dto.firebaseRefId);
 
     if (!user) {
       throw new UserNotFoundException();

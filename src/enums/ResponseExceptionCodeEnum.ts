@@ -7,6 +7,7 @@ enum ResponseExceptionCodeEnum {
   AUTH_TOKEN_INVALID = 'auth_token_invalid',
   FIREBASE_REF_ID_MISSING = 'firebase_ref_id_missing',
   USER_NOT_FOUND = 'user_not_found',
+  REQUEST_BODY_INVALID = 'request_body_invalid',
 }
 
 export default ResponseExceptionCodeEnum;
