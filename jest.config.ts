@@ -12,8 +12,10 @@ const jestConfig: JestConfigWithTsJest = {
   collectCoverageFrom: ['./src/(services|mappers)/**/*.ts'],
   testPathIgnorePatterns: ['/build'],
   roots: ['<rootDir>'],
-  modulePaths: [compilerOptions.baseUrl],
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths),
+  // modulePaths: [compilerOptions.baseUrl],
+  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
+  prefix: '<rootDir>/',
+}),
   maxConcurrency: 2
 };
 
