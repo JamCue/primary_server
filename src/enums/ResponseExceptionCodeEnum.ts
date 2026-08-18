@@ -8,6 +8,11 @@ enum ResponseExceptionCodeEnum {
   FIREBASE_REF_ID_MISSING = 'firebase_ref_id_missing',
   USER_NOT_FOUND = 'user_not_found',
   REQUEST_BODY_INVALID = 'request_body_invalid',
+  FILE_MISSING = 'file_missing',
+  FILE_TYPE_INVALID = 'file_type_invalid',
+  FILE_TOO_LARGE = 'file_too_large',
+  FILE_UPLOAD_FAILED = 'file_upload_failed',
+  FILE_TEXT_EXTRACTION_FAILED = 'file_text_extraction_failed',
 }
 
 export default ResponseExceptionCodeEnum;
