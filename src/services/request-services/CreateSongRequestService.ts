@@ -1,28 +1,28 @@
-import CreateUserRequestServiceDto from '@dtos/CreateUserRequestServiceDto';
+import CreateSongRequestServiceDto from '@dtos/CreateSongRequestServiceDto';
 import RequestServiceInterface from '@i/RequestServiceInterface';
-import CreateUserDtoMapper from '@mappers/CreateUserDtoMapper';
-import createUserSchema from '@schemas/CreateUserSchema';
+import CreateSongDtoMapper from '@mappers/CreateSongDtoMapper';
+import createSongSchema from '@schemas/CreateSongSchema';
 import GetFirebaseRefIdFromRequestService from '@services/parameter-validation/GetFirebaseRefIdFromRequestService';
 import GetValidatedRequestBodyService from '@services/parameter-validation/GetValidatedRequestBodyService';
 import {Request} from 'express';
 
-class CreateUserRequestService implements RequestServiceInterface {
+class CreateSongRequestService implements RequestServiceInterface {
   constructor(
     private readonly getValidatedRequestBodyService = new GetValidatedRequestBodyService(),
     private readonly getFirebaseRefIdFromRequestService = new GetFirebaseRefIdFromRequestService(),
-    private readonly mapper = new CreateUserDtoMapper()
+    private readonly mapper = new CreateSongDtoMapper()
   ) {}
 
   /**
    * @throws parameter-validation/RequestValidationException
    * @throws parameter-validation/FirebaseRefIdMissingException
    */
-  public async handle(req: Request): Promise<CreateUserRequestServiceDto> {
-    const {name, email} = this.getValidatedRequestBodyService.handle(req, createUserSchema);
+  public async handle(req: Request): Promise<CreateSongRequestServiceDto> {
+    const payload = this.getValidatedRequestBodyService.handle(req, createSongSchema);
     const firebaseRefId = this.getFirebaseRefIdFromRequestService.handle(req);
 
-    return this.mapper.map({name, email, firebaseRefId});
+    return this.mapper.map(payload, firebaseRefId);
   }
 }
 
-export default CreateUserRequestService;
+export default CreateSongRequestService;

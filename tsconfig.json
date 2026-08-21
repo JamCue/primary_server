@@ -17,6 +17,7 @@
       "@middlewares/*": ["./src/middlewares/*"],
       "@repositories/*": ["./src/repositories/*"],
       "@routes/*": ["./src/routes/*"],
+      "@schemas/*": ["./src/schemas/*"],
       "@services/*": ["./src/services/*"],
       "@t/*": ["./src/types/*"],
       "@value-objects/*": ["./src/value-objects/*"]

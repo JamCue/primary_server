@@ -1,4 +1,5 @@
 import CheckIfUserEmailExistsController from '@controllers/CheckIfUserEmailExistsController';
+import CreateSongController from '@controllers/CreateSongController';
 import CreateUserController from '@controllers/CreateUserController';
 import ExtractFileTextController from '@controllers/ExtractFileTextController';
 import GetLoggedInUserController from '@controllers/GetLoggedInUserController';
@@ -19,5 +20,6 @@ router.post(
   new UploadFileMiddleware().run,
   new ExtractFileTextController().post
 );
+router.post('/songs', new AuthenticateUserMiddleware().run, new CreateSongController().post);
 
 export default router;
