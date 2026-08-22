@@ -4,7 +4,14 @@ import AbstractRepository from '@repositories/AbstractRepository';
 import CreateSongPayloadType from '@t/CreateSongPayloadType';
 import ListSongsFilterType from '@t/ListSongsFilterType';
 import SongType from '@t/SongType';
+import UpdateSongPayloadType from '@t/UpdateSongPayloadType';
 import {FilterQuery, Schema} from 'mongoose';
+
+// The optional song fields an edit may clear — sent as `undefined` in
+// UpdateSongPayloadType, which `update()` below translates into a Mongo
+// $unset rather than a $set (silently dropping them would otherwise never
+// remove a previously-set value from the document).
+const OPTIONAL_SONG_FIELDS = ['artist', 'key', 'capo', 'tempo', 'timeSignature', 'strummingPattern'] as const;
 
 type SongDocumentType = {
   _id: unknown;
@@ -66,6 +73,31 @@ class SongRepository extends AbstractRepository<SongType> {
   public async getById(songId: string): Promise<SongType | null> {
     try {
       const song = await this.collection.findById(songId).lean();
+
+      return song ? this.toSongType(song as SongDocumentType) : null;
+    } catch (e: unknown) {
+      throw new DbException(e);
+    }
+  }
+
+  public async update(songId: string, payload: UpdateSongPayloadType): Promise<SongType | null> {
+    try {
+      const set: Partial<SongDocumentType> = {
+        title: payload.title,
+        sheetContent: payload.sheetContent,
+        chords: payload.chords,
+      };
+      const unset: Partial<Record<(typeof OPTIONAL_SONG_FIELDS)[number], ''>> = {};
+
+      for (const field of OPTIONAL_SONG_FIELDS) {
+        if (payload[field] === undefined) {
+          unset[field] = '';
+        } else {
+          (set as Record<string, unknown>)[field] = payload[field];
+        }
+      }
+
+      const song = await this.collection.findByIdAndUpdate(songId, {$set: set, $unset: unset}, {new: true}).lean();
 
       return song ? this.toSongType(song as SongDocumentType) : null;
     } catch (e: unknown) {

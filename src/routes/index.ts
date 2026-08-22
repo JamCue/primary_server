@@ -7,6 +7,7 @@ import GetMicroserviceVersionController from '@controllers/GetMicroserviceVersio
 import GetSongByIdController from '@controllers/GetSongByIdController';
 import ListSongsController from '@controllers/ListSongsController';
 import SetSongFavoriteController from '@controllers/SetSongFavoriteController';
+import UpdateSongController from '@controllers/UpdateSongController';
 import AuthenticateUserMiddleware from '@middlewares/AuthenticateUserMiddleware';
 import UploadFileMiddleware from '@middlewares/UploadFileMiddleware';
 import {Router} from 'express';
@@ -26,6 +27,7 @@ router.post(
 router.post('/songs', new AuthenticateUserMiddleware().run, new CreateSongController().post);
 router.get('/songs', new AuthenticateUserMiddleware().run, new ListSongsController().get);
 router.get('/songs/:songId', new AuthenticateUserMiddleware().run, new GetSongByIdController().get);
+router.patch('/songs/:songId', new AuthenticateUserMiddleware().run, new UpdateSongController().patch);
 router.patch('/songs/:songId/favorite', new AuthenticateUserMiddleware().run, new SetSongFavoriteController().patch);
 
 export default router;

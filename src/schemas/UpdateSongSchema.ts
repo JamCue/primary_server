@@ -1,4 +1,3 @@
-import SongSourceEnum from '@enums/SongSourceEnum';
 import {
   KEY_PATTERN,
   optionalInt,
@@ -8,7 +7,12 @@ import {
 } from '@schemas/shared/songFieldSchemas';
 import {z} from 'zod';
 
-const createSongSchema = z.object({
+// Same shape as CreateSongSchema minus `source`, which is set once at
+// creation and never edited. Unlike creation, every field but `title` and
+// `sheetContent` is optional on the *value* itself (not just "may be
+// omitted from the body") — an editor may clear a previously-set field
+// (e.g. remove the capo), which the repository translates into an unset.
+const updateSongSchema = z.object({
   title: z.string().trim().min(1).max(200),
   artist: optionalTrimmedString(200),
   key: optionalPattern(KEY_PATTERN, 10),
@@ -16,10 +20,7 @@ const createSongSchema = z.object({
   tempo: optionalInt(20, 300),
   timeSignature: optionalPattern(TIME_SIGNATURE_PATTERN, 10),
   strummingPattern: optionalTrimmedString(100),
-  // Whitespace inside sheetContent is significant (it's what aligns chords
-  // above lyrics), so it's validated but never trimmed or otherwise altered.
   sheetContent: z.string().min(1).max(50_000),
-  source: z.nativeEnum(SongSourceEnum),
 });
 
-export default createSongSchema;
+export default updateSongSchema;
