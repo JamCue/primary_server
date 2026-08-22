@@ -4,6 +4,7 @@ import CreateUserController from '@controllers/CreateUserController';
 import ExtractFileTextController from '@controllers/ExtractFileTextController';
 import GetLoggedInUserController from '@controllers/GetLoggedInUserController';
 import GetMicroserviceVersionController from '@controllers/GetMicroserviceVersionController';
+import GetSongByIdController from '@controllers/GetSongByIdController';
 import ListSongsController from '@controllers/ListSongsController';
 import SetSongFavoriteController from '@controllers/SetSongFavoriteController';
 import AuthenticateUserMiddleware from '@middlewares/AuthenticateUserMiddleware';
@@ -24,6 +25,7 @@ router.post(
 );
 router.post('/songs', new AuthenticateUserMiddleware().run, new CreateSongController().post);
 router.get('/songs', new AuthenticateUserMiddleware().run, new ListSongsController().get);
+router.get('/songs/:songId', new AuthenticateUserMiddleware().run, new GetSongByIdController().get);
 router.patch('/songs/:songId/favorite', new AuthenticateUserMiddleware().run, new SetSongFavoriteController().patch);
 
 export default router;
