@@ -1,4 +1,5 @@
 import CheckIfUserEmailExistsController from '@controllers/CheckIfUserEmailExistsController';
+import CreateJamController from '@controllers/CreateJamController';
 import CreateSongController from '@controllers/CreateSongController';
 import CreateUserController from '@controllers/CreateUserController';
 import ExtractFileTextController from '@controllers/ExtractFileTextController';
@@ -29,5 +30,6 @@ router.get('/songs', new AuthenticateUserMiddleware().run, new ListSongsControll
 router.get('/songs/:songId', new AuthenticateUserMiddleware().run, new GetSongByIdController().get);
 router.patch('/songs/:songId', new AuthenticateUserMiddleware().run, new UpdateSongController().patch);
 router.patch('/songs/:songId/favorite', new AuthenticateUserMiddleware().run, new SetSongFavoriteController().patch);
+router.post('/jams', new AuthenticateUserMiddleware().run, new CreateJamController().post);
 
 export default router;
