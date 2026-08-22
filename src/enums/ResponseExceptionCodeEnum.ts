@@ -12,6 +12,8 @@ enum ResponseExceptionCodeEnum {
   FILE_TOO_LARGE = 'file_too_large',
   FILE_UPLOAD_FAILED = 'file_upload_failed',
   FILE_TEXT_EXTRACTION_FAILED = 'file_text_extraction_failed',
+  SONG_NOT_FOUND = 'song_not_found',
+  SONG_ID_INVALID = 'song_id_invalid',
 }
 
 export default ResponseExceptionCodeEnum;

@@ -13,6 +13,7 @@ type SongType = {
   sheetContent: string;
   chords: string[];
   source: SongSourceEnum;
+  isFavorite: boolean;
   createdAt: Date;
   updatedAt: Date;
 };

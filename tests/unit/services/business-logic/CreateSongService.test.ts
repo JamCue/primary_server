@@ -1,16 +1,13 @@
 import CreateSongRequestServiceDto from '@dtos/CreateSongRequestServiceDto';
 import SongSourceEnum from '@enums/SongSourceEnum';
-import GetUserByFirebaseRefIdServiceException from '@exceptions/inner/GetUserByFirebaseRefIdServiceException';
-import UserNotFoundException from '@exceptions/UserNotFoundException';
-import UserRepository from '@repositories/UserRepository';
 import CreateSongService from '@services/business-logic/CreateSongService';
 import ExtractChordsFromSheetContentService from '@services/business-logic/ExtractChordsFromSheetContentService';
+import GetMusicianByFirebaseRefIdService from '@services/business-logic/GetMusicianByFirebaseRefIdService';
 import SaveSongService from '@services/business-logic/SaveSongService';
 import SongType from '@t/SongType';
 import UserType from '@t/UserType';
 import HttpResponseCreated from '@value-objects/HttpResponseCreated';
 
-import mockImplementation from '../../utils/mockImplementation';
 import mockResolvedValue from '../../utils/mockResolvedValue';
 import mockReturnValue from '../../utils/mockReturnValue';
 
@@ -38,47 +35,28 @@ describe('CreateSongService', () => {
     musicianId: musician.id,
     ...dto,
     chords,
+    isFavorite: false,
     createdAt: new Date(),
     updatedAt: new Date(),
   } as SongType;
 
-  const userRepository = new UserRepository();
+  const getMusicianByFirebaseRefIdService = new GetMusicianByFirebaseRefIdService();
   const extractChordsFromSheetContentService = new ExtractChordsFromSheetContentService();
   const saveSongService = new SaveSongService();
   const createSongService = new CreateSongService(
-    userRepository,
+    getMusicianByFirebaseRefIdService,
     extractChordsFromSheetContentService,
     saveSongService
   );
 
   describe('handle', () => {
-    describe('when userRepository fails', () => {
-      test('it throws GetUserByFirebaseRefIdServiceException', async () => {
-        userRepository.getByFirebaseRefId = mockImplementation(() => {
-          throw new Error();
-        });
-
-        await expect(createSongService.handle(dto)).rejects.toBeInstanceOf(GetUserByFirebaseRefIdServiceException);
-        expect(jest.spyOn(saveSongService, 'handle')).toHaveBeenCalledTimes(0);
-      });
-    });
-
-    describe('when no musician is found for the authenticated request', () => {
-      test('it throws UserNotFoundException', async () => {
-        userRepository.getByFirebaseRefId = mockResolvedValue(null);
-
-        await expect(createSongService.handle(dto)).rejects.toBeInstanceOf(UserNotFoundException);
-        expect(jest.spyOn(saveSongService, 'handle')).toHaveBeenCalledTimes(0);
-      });
-    });
-
     test('it handles', async () => {
-      userRepository.getByFirebaseRefId = mockResolvedValue(musician);
+      getMusicianByFirebaseRefIdService.handle = mockResolvedValue(musician);
       extractChordsFromSheetContentService.handle = mockReturnValue(chords);
       saveSongService.handle = mockResolvedValue(song);
 
       await expect(createSongService.handle(dto)).resolves.toStrictEqual(new HttpResponseCreated(song));
-      expect(jest.spyOn(userRepository, 'getByFirebaseRefId')).toHaveBeenCalledWith(dto.firebaseRefId);
+      expect(jest.spyOn(getMusicianByFirebaseRefIdService, 'handle')).toHaveBeenCalledWith(dto.firebaseRefId);
       expect(jest.spyOn(extractChordsFromSheetContentService, 'handle')).toHaveBeenCalledWith(dto.sheetContent);
       expect(jest.spyOn(saveSongService, 'handle')).toHaveBeenCalledWith({
         musicianId: musician.id,
@@ -92,6 +70,7 @@ describe('CreateSongService', () => {
         sheetContent: dto.sheetContent,
         chords,
         source: dto.source,
+        isFavorite: false,
       });
     });
   });

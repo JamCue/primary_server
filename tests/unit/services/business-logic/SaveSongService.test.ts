@@ -26,6 +26,7 @@ describe('SaveSongService', () => {
     sheetContent: 'Eb              Fm     Bb\nOffo! Isey.. isey daant ke bhagaaun',
     chords: ['Eb', 'Fm', 'Bb'],
     source: SongSourceEnum.PDF,
+    isFavorite: false,
   };
   const song = {id: 'id', ...payload, createdAt: new Date(), updatedAt: new Date()} as SongType;
 

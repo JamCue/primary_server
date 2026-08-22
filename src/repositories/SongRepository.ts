@@ -2,8 +2,9 @@ import SongSourceEnum from '@enums/SongSourceEnum';
 import DbException from '@exceptions/inner/DbException';
 import AbstractRepository from '@repositories/AbstractRepository';
 import CreateSongPayloadType from '@t/CreateSongPayloadType';
+import ListSongsFilterType from '@t/ListSongsFilterType';
 import SongType from '@t/SongType';
-import {Schema} from 'mongoose';
+import {FilterQuery, Schema} from 'mongoose';
 
 type SongDocumentType = {
   _id: unknown;
@@ -18,6 +19,7 @@ type SongDocumentType = {
   sheetContent: string;
   chords: string[];
   source: SongSourceEnum;
+  isFavorite: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -38,9 +40,13 @@ const songSchema = new Schema<SongType>(
     sheetContent: {type: String, required: true},
     chords: {type: [String], default: []},
     source: {type: String, enum: Object.values(SongSourceEnum), required: true},
+    isFavorite: {type: Boolean, required: true, default: false},
   },
   {timestamps: {createdAt: true, updatedAt: true}}
 );
+
+// Escapes regex metacharacters so search input is matched literally.
+const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 class SongRepository extends AbstractRepository<SongType> {
   constructor() {
@@ -57,6 +63,63 @@ class SongRepository extends AbstractRepository<SongType> {
     }
   }
 
+  public async getById(songId: string): Promise<SongType | null> {
+    try {
+      const song = await this.collection.findById(songId).lean();
+
+      return song ? this.toSongType(song as SongDocumentType) : null;
+    } catch (e: unknown) {
+      throw new DbException(e);
+    }
+  }
+
+  public async updateFavorite(songId: string, isFavorite: boolean): Promise<SongType | null> {
+    try {
+      const song = await this.collection.findByIdAndUpdate(songId, {isFavorite}, {new: true}).lean();
+
+      return song ? this.toSongType(song as SongDocumentType) : null;
+    } catch (e: unknown) {
+      throw new DbException(e);
+    }
+  }
+
+  public async list(filter: ListSongsFilterType): Promise<{songs: SongType[]; total: number}> {
+    try {
+      const query = this.buildListFilterQuery(filter);
+      const sort: Record<string, 1 | -1> = filter.sort === 'recent' ? {createdAt: -1} : {title: 1};
+      const skip = (filter.page - 1) * filter.limit;
+
+      const [songs, total] = await Promise.all([
+        this.collection.find(query).sort(sort).skip(skip).limit(filter.limit).lean(),
+        this.collection.countDocuments(query),
+      ]);
+
+      return {songs: (songs as SongDocumentType[]).map(song => this.toSongType(song)), total};
+    } catch (e: unknown) {
+      throw new DbException(e);
+    }
+  }
+
+  private buildListFilterQuery(filter: ListSongsFilterType): FilterQuery<SongType> {
+    const query: FilterQuery<SongType> = {musicianId: filter.musicianId};
+
+    if (filter.key) {
+      query.key = filter.key;
+    }
+
+    if (filter.favorite !== undefined) {
+      query.isFavorite = filter.favorite;
+    }
+
+    if (filter.search) {
+      const pattern = new RegExp(escapeRegExp(filter.search), 'i');
+
+      query.$or = [{title: pattern}, {artist: pattern}, {key: pattern}];
+    }
+
+    return query;
+  }
+
   private toSongType(song: SongDocumentType): SongType {
     return {
       id: String(song._id),
@@ -71,6 +134,7 @@ class SongRepository extends AbstractRepository<SongType> {
       sheetContent: song.sheetContent,
       chords: song.chords,
       source: song.source,
+      isFavorite: song.isFavorite,
       createdAt: song.createdAt,
       updatedAt: song.updatedAt,
     };
