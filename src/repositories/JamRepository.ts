@@ -6,7 +6,8 @@ import AbstractRepository from '@repositories/AbstractRepository';
 import CreateJamPayloadType from '@t/CreateJamPayloadType';
 import JamSetlistSongType from '@t/JamSetlistSongType';
 import JamType from '@t/JamType';
-import {Schema} from 'mongoose';
+import ListJamsFilterType from '@t/ListJamsFilterType';
+import {FilterQuery, Schema} from 'mongoose';
 
 type JamDocumentType = {
   _id: unknown;
@@ -78,6 +79,37 @@ class JamRepository extends AbstractRepository<JamType> {
     } catch (e: unknown) {
       throw new DbException(e);
     }
+  }
+
+  public async list(filter: ListJamsFilterType): Promise<{jams: JamType[]; total: number}> {
+    try {
+      const query = this.buildListFilterQuery(filter);
+      // 'upcoming' leads with the soonest jam first; 'past' and the
+      // unfiltered default lead with the most recently scheduled one.
+      const sort: Record<string, 1 | -1> = {scheduledAt: filter.when === 'upcoming' ? 1 : -1};
+      const skip = (filter.page - 1) * filter.limit;
+
+      const [jams, total] = await Promise.all([
+        this.collection.find(query).sort(sort).skip(skip).limit(filter.limit).lean(),
+        this.collection.countDocuments(query),
+      ]);
+
+      return {jams: (jams as JamDocumentType[]).map(jam => this.toJamType(jam)), total};
+    } catch (e: unknown) {
+      throw new DbException(e);
+    }
+  }
+
+  private buildListFilterQuery(filter: ListJamsFilterType): FilterQuery<JamType> {
+    const query: FilterQuery<JamType> = {musicianId: filter.musicianId};
+
+    if (filter.when === 'upcoming') {
+      query.scheduledAt = {$gte: new Date()};
+    } else if (filter.when === 'past') {
+      query.scheduledAt = {$lt: new Date()};
+    }
+
+    return query;
   }
 
   private toJamType(jam: JamDocumentType): JamType {
