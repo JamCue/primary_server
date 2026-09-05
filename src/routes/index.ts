@@ -3,6 +3,7 @@ import CreateJamController from '@controllers/CreateJamController';
 import CreateSongController from '@controllers/CreateSongController';
 import CreateUserController from '@controllers/CreateUserController';
 import ExtractFileTextController from '@controllers/ExtractFileTextController';
+import GetJamByIdController from '@controllers/GetJamByIdController';
 import GetLoggedInUserController from '@controllers/GetLoggedInUserController';
 import GetMicroserviceVersionController from '@controllers/GetMicroserviceVersionController';
 import GetSongByIdController from '@controllers/GetSongByIdController';
@@ -33,5 +34,6 @@ router.patch('/songs/:songId', new AuthenticateUserMiddleware().run, new UpdateS
 router.patch('/songs/:songId/favorite', new AuthenticateUserMiddleware().run, new SetSongFavoriteController().patch);
 router.post('/jams', new AuthenticateUserMiddleware().run, new CreateJamController().post);
 router.get('/jams', new AuthenticateUserMiddleware().run, new ListJamsController().get);
+router.get('/jams/:jamId', new AuthenticateUserMiddleware().run, new GetJamByIdController().get);
 
 export default router;

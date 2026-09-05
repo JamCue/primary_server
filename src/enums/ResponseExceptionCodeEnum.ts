@@ -14,6 +14,8 @@ enum ResponseExceptionCodeEnum {
   FILE_TEXT_EXTRACTION_FAILED = 'file_text_extraction_failed',
   SONG_NOT_FOUND = 'song_not_found',
   SONG_ID_INVALID = 'song_id_invalid',
+  JAM_NOT_FOUND = 'jam_not_found',
+  JAM_ID_INVALID = 'jam_id_invalid',
 }
 
 export default ResponseExceptionCodeEnum;

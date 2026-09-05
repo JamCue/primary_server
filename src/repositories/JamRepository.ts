@@ -81,6 +81,16 @@ class JamRepository extends AbstractRepository<JamType> {
     }
   }
 
+  public async getById(jamId: string): Promise<JamType | null> {
+    try {
+      const jam = await this.collection.findById(jamId).lean();
+
+      return jam ? this.toJamType(jam as JamDocumentType) : null;
+    } catch (e: unknown) {
+      throw new DbException(e);
+    }
+  }
+
   public async list(filter: ListJamsFilterType): Promise<{jams: JamType[]; total: number}> {
     try {
       const query = this.buildListFilterQuery(filter);
